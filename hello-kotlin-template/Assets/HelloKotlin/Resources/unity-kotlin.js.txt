@@ -1,0 +1,300 @@
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd)
+    define(['exports', 'kotlin', 'csharp', 'kotlinx-coroutines-core'], factory);
+  else if (typeof exports === 'object')
+    factory(module.exports, require('kotlin'), require('csharp'), require('kotlinx-coroutines-core'));
+  else {
+    if (typeof kotlin === 'undefined') {
+      throw new Error("Error loading module 'unity-kotlin'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'unity-kotlin'.");
+    }
+    if (typeof csharp === 'undefined') {
+      throw new Error("Error loading module 'unity-kotlin'. Its dependency 'csharp' was not found. Please, check whether 'csharp' is loaded prior to 'unity-kotlin'.");
+    }
+    if (typeof this['kotlinx-coroutines-core'] === 'undefined') {
+      throw new Error("Error loading module 'unity-kotlin'. Its dependency 'kotlinx-coroutines-core' was not found. Please, check whether 'kotlinx-coroutines-core' is loaded prior to 'unity-kotlin'.");
+    }
+    root['unity-kotlin'] = factory(typeof this['unity-kotlin'] === 'undefined' ? {} : this['unity-kotlin'], kotlin, csharp, this['kotlinx-coroutines-core']);
+  }
+}(this, function (_, Kotlin, $module$csharp, $module$kotlinx_coroutines_core) {
+  'use strict';
+  var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
+  var coroutines = Kotlin.kotlin.coroutines;
+  var startCoroutine = Kotlin.kotlin.coroutines.startCoroutine_x18nsh$;
+  var printStackTrace = Kotlin.kotlin.printStackTrace_dbl4o4$;
+  var Throwable = Error;
+  var Kind_CLASS = Kotlin.Kind.CLASS;
+  var Continuation = Kotlin.kotlin.coroutines.Continuation;
+  var throwOnFailure = Kotlin.kotlin.throwOnFailure_iacion$;
+  var Any = Object;
+  var throwCCE = Kotlin.throwCCE;
+  var Debug$Companion = $module$csharp.UnityEngine.Debug;
+  var defineInlineFunction = Kotlin.defineInlineFunction;
+  var COROUTINE_SUSPENDED = Kotlin.kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED;
+  var CoroutineImpl = Kotlin.kotlin.coroutines.CoroutineImpl;
+  var GameObject_init = $module$csharp.UnityEngine.GameObject;
+  var HelloKotlin$Companion = $module$csharp.UnityKotlin.HelloKotlin;
+  var IntRange = Kotlin.kotlin.ranges.IntRange;
+  var L1000 = Kotlin.Long.fromInt(1000);
+  var delay = $module$kotlinx_coroutines_core.kotlinx.coroutines.delay_s8cxhz$;
+  var Unit = Kotlin.kotlin.Unit;
+  var coroutineScope = $module$kotlinx_coroutines_core.kotlinx.coroutines.coroutineScope_awg8ri$;
+  var Vector3_init = $module$csharp.UnityEngine.Vector3;
+  var L16 = Kotlin.Long.fromInt(16);
+  var internal = Kotlin.kotlin.coroutines.js.internal;
+  function launch(block) {
+    launch_0(block, coroutines.EmptyCoroutineContext);
+  }
+  function launch_0(block, context) {
+    startCoroutine(block, new StandaloneCoroutine(context));
+  }
+  function StandaloneCoroutine(context) {
+    this.context_werskr$_0 = context;
+  }
+  Object.defineProperty(StandaloneCoroutine.prototype, 'context', {
+    get: function () {
+      return this.context_werskr$_0;
+    }
+  });
+  StandaloneCoroutine.prototype.resumeWith_tl1gpc$ = function (result) {
+    try {
+      var tmp$;
+      throwOnFailure(result);
+      (tmp$ = result.value) == null || Kotlin.isType(tmp$, Any) ? tmp$ : throwCCE();
+    } catch (e) {
+      if (Kotlin.isType(e, Throwable)) {
+        printStackTrace(e);
+      } else
+        throw e;
+    }
+  };
+  StandaloneCoroutine.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'StandaloneCoroutine',
+    interfaces: [Continuation]
+  };
+  function println(message) {
+    Debug$Companion.Log(message != null ? message : 'null');
+  }
+  var SetPosition = defineInlineFunction('unity-kotlin.SetPosition_rry3v7$', function ($receiver, position) {
+    $receiver.SetPositionAndRotation(position, $receiver.rotation);
+  });
+  function Coroutine$main$lambda($receiver_0, controller, continuation_0) {
+    CoroutineImpl.call(this, continuation_0);
+    this.$controller = controller;
+    this.exceptionState_0 = 1;
+    this.local$tmp$ = void 0;
+  }
+  Coroutine$main$lambda.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: null,
+    interfaces: [CoroutineImpl]
+  };
+  Coroutine$main$lambda.prototype = Object.create(CoroutineImpl.prototype);
+  Coroutine$main$lambda.prototype.constructor = Coroutine$main$lambda;
+  Coroutine$main$lambda.prototype.doResume = function () {
+    do
+      try {
+        switch (this.state_0) {
+          case 0:
+            var gameObject = new GameObject_init('Hello Kotlin 0.1');
+            println(gameObject.name);
+            HelloKotlin$Companion.CallStaticFunction(gameObject);
+            println(HelloKotlin$Companion.Sum(1.0, 1.0));
+            println(HelloKotlin$Companion.Sum(2.0, 2.0));
+            println(HelloKotlin$Companion.Sum(4.0, 100.0));
+            this.local$tmp$ = (new IntRange(0, 10)).iterator();
+            this.state_0 = 2;
+            continue;
+          case 1:
+            throw this.exception_0;
+          case 2:
+            if (!this.local$tmp$.hasNext()) {
+              this.state_0 = 4;
+              continue;
+            }
+
+            var element = this.local$tmp$.next();
+            println('kotlinx-coroutines iteration ' + element + '!');
+            this.state_0 = 3;
+            this.result_0 = delay(L1000, this);
+            if (this.result_0 === COROUTINE_SUSPENDED)
+              return COROUTINE_SUSPENDED;
+            continue;
+          case 3:
+            this.state_0 = 2;
+            continue;
+          case 4:
+            return println('kotlinx-coroutines exiting main!'), Unit;
+          default:
+            this.state_0 = 1;
+            throw new Error('State Machine Unreachable execution');
+        }
+      } catch (e) {
+        if (this.state_0 === 1) {
+          this.exceptionState_0 = this.state_0;
+          throw e;
+        } else {
+          this.state_0 = this.exceptionState_0;
+          this.exception_0 = e;
+        }
+      }
+     while (true);
+  };
+  function main$lambda($receiver_0, continuation_0, suspended) {
+    var instance = new Coroutine$main$lambda($receiver_0, this, continuation_0);
+    if (suspended)
+      return instance;
+    else
+      return instance.doResume(null);
+  }
+  function main(continuation) {
+    return coroutineScope(main$lambda, continuation);
+  }
+  function greet() {
+    return 'Kotlin';
+  }
+  function greetByName(name) {
+    return 'Hello ' + name + '!';
+  }
+  function Coroutine$useInstance$lambda(closure$instance_0, continuation_0) {
+    CoroutineImpl.call(this, continuation_0);
+    this.exceptionState_0 = 1;
+    this.local$closure$instance = closure$instance_0;
+  }
+  Coroutine$useInstance$lambda.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: null,
+    interfaces: [CoroutineImpl]
+  };
+  Coroutine$useInstance$lambda.prototype = Object.create(CoroutineImpl.prototype);
+  Coroutine$useInstance$lambda.prototype.constructor = Coroutine$useInstance$lambda;
+  Coroutine$useInstance$lambda.prototype.doResume = function () {
+    do
+      try {
+        switch (this.state_0) {
+          case 0:
+            this.state_0 = 2;
+            this.result_0 = moveCamera(this.local$closure$instance, this);
+            if (this.result_0 === COROUTINE_SUSPENDED)
+              return COROUTINE_SUSPENDED;
+            continue;
+          case 1:
+            throw this.exception_0;
+          case 2:
+            return this.result_0;
+          default:
+            this.state_0 = 1;
+            throw new Error('State Machine Unreachable execution');
+        }
+      } catch (e) {
+        if (this.state_0 === 1) {
+          this.exceptionState_0 = this.state_0;
+          throw e;
+        } else {
+          this.state_0 = this.exceptionState_0;
+          this.exception_0 = e;
+        }
+      }
+     while (true);
+  };
+  function useInstance$lambda(closure$instance_0) {
+    return function (continuation_0, suspended) {
+      var instance = new Coroutine$useInstance$lambda(closure$instance_0, continuation_0);
+      if (suspended)
+        return instance;
+      else
+        return instance.doResume(null);
+    };
+  }
+  function useInstance(instance) {
+    println('useInstance');
+    println(instance);
+    var result = instance.CSharpCall('Kotlin');
+    println(result);
+    launch(useInstance$lambda(instance));
+  }
+  function Coroutine$moveCamera(instance_0, continuation_0) {
+    CoroutineImpl.call(this, continuation_0);
+    this.exceptionState_0 = 1;
+    this.local$tmp$ = void 0;
+    this.local$instance = instance_0;
+  }
+  Coroutine$moveCamera.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: null,
+    interfaces: [CoroutineImpl]
+  };
+  Coroutine$moveCamera.prototype = Object.create(CoroutineImpl.prototype);
+  Coroutine$moveCamera.prototype.constructor = Coroutine$moveCamera;
+  Coroutine$moveCamera.prototype.doResume = function () {
+    do
+      try {
+        switch (this.state_0) {
+          case 0:
+            println('moveCamera');
+            this.local$tmp$ = (new IntRange(0, 120)).iterator();
+            this.state_0 = 2;
+            continue;
+          case 1:
+            throw this.exception_0;
+          case 2:
+            if (!this.local$tmp$.hasNext()) {
+              this.state_0 = 4;
+              continue;
+            }
+
+            var element = this.local$tmp$.next();
+            var $receiver = this.local$instance.gameObject.transform;
+            $receiver.SetPositionAndRotation(new Vector3_init(element / 10.0, 0, 0), $receiver.rotation);
+            this.state_0 = 3;
+            this.result_0 = delay(L16, this);
+            if (this.result_0 === COROUTINE_SUSPENDED)
+              return COROUTINE_SUSPENDED;
+            continue;
+          case 3:
+            this.state_0 = 2;
+            continue;
+          case 4:
+            return;
+          default:
+            this.state_0 = 1;
+            throw new Error('State Machine Unreachable execution');
+        }
+      } catch (e) {
+        if (this.state_0 === 1) {
+          this.exceptionState_0 = this.state_0;
+          throw e;
+        } else {
+          this.state_0 = this.exceptionState_0;
+          this.exception_0 = e;
+        }
+      }
+     while (true);
+  };
+  function moveCamera(instance_0, continuation_0, suspended) {
+    var instance_1 = new Coroutine$moveCamera(instance_0, continuation_0);
+    if (suspended)
+      return instance_1;
+    else
+      return instance_1.doResume(null);
+  }
+  var package$com = _.com || (_.com = {});
+  var package$hiperbou = package$com.hiperbou || (package$com.hiperbou = {});
+  var package$unity = package$hiperbou.unity || (package$hiperbou.unity = {});
+  var package$coroutines = package$unity.coroutines || (package$unity.coroutines = {});
+  package$coroutines.launch_g2bo5h$ = launch;
+  package$coroutines.launch_bacyg4$ = launch_0;
+  _.println_s8jyv4$ = println;
+  _.SetPosition_rry3v7$ = SetPosition;
+  _.main = main;
+  _.greet = greet;
+  _.greetByName = greetByName;
+  _.useInstance = useInstance;
+  $$importsForInline$$['unity-kotlin'] = _;
+  _.moveCamera_o98sb0$ = moveCamera;
+  main(internal.EmptyContinuation, false);
+  Kotlin.defineModule('unity-kotlin', _);
+  return _;
+}));
+
+//# sourceMappingURL=unity-kotlin.js.map
