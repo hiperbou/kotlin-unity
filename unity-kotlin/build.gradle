@@ -1,0 +1,39 @@
+plugins {
+    id 'org.jetbrains.kotlin.js' version '1.6.20'
+}
+
+group = 'com.hiperbou.unity'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.6.2")
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+kotlin {
+    js(LEGACY) {
+        //useCommonJs()
+        binaries.executable()
+        //browser()
+        /*browser {
+            //webpackTask {
+            //    output.libraryTarget = "commonjs"
+            //}
+            commonWebpackConfig {
+                cssSupport.enabled = true
+            }
+        }*/
+    }
+}
+
+task copyJsToResources(type: Copy) {
+    from 'build/classes/kotlin/main/unity-kotlin.js'
+    into "../hello-kotlin-template/Assets/HelloKotlin/Resources"
+    rename 'unity-kotlin.js', "unity-kotlin.js.txt"
+}
+
+build.finalizedBy(copyJsToResources)
