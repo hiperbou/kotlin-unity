@@ -41,6 +41,17 @@
   var Vector3_init = $module$csharp.UnityEngine.Vector3;
   var L16 = Kotlin.Long.fromInt(16);
   var internal = Kotlin.kotlin.coroutines.js.internal;
+  var Kind_OBJECT = Kotlin.Kind.OBJECT;
+  var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
+  var Input$Companion = $module$csharp.UnityEngine.Input;
+  var KeyCode$W = $module$csharp.UnityEngine.KeyCode.W;
+  var KeyCode$S = $module$csharp.UnityEngine.KeyCode.S;
+  var getCallableRef = Kotlin.getCallableRef;
+  var Time$Companion = $module$csharp.UnityEngine.Time;
+  var KeyCode$UpArrow = $module$csharp.UnityEngine.KeyCode.UpArrow;
+  var KeyCode$DownArrow = $module$csharp.UnityEngine.KeyCode.DownArrow;
+  var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
+  var JsMath = Math;
   function launch(block) {
     launch_0(block, coroutines.EmptyCoroutineContext);
   }
@@ -278,6 +289,306 @@
     else
       return instance_1.doResume(null);
   }
+  function PongRules() {
+    PongRules_instance = this;
+    this.top = -5.0;
+    this.bottom = 5.0;
+    this.left = -7.0;
+    this.right = 7.0;
+    this.paddleHalfHeight = 1.0;
+  }
+  PongRules.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'PongRules',
+    interfaces: []
+  };
+  var PongRules_instance = null;
+  function PongRules_getInstance() {
+    if (PongRules_instance === null) {
+      new PongRules();
+    }
+    return PongRules_instance;
+  }
+  function Updatable() {
+  }
+  Updatable.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'Updatable',
+    interfaces: []
+  };
+  function PaddleController(moveUp, moveDown) {
+    if (moveUp === void 0)
+      moveUp = KeyCode$W;
+    if (moveDown === void 0)
+      moveDown = KeyCode$S;
+    this.moveUp_0 = moveUp;
+    this.moveDown_0 = moveDown;
+    this.onMove = PaddleController$onMove$lambda;
+  }
+  PaddleController.prototype.update_mx4ult$ = function (deltaTime) {
+    this.onMove(Input$Companion.GetKey(this.moveUp_0) ? -1 : Input$Companion.GetKey(this.moveDown_0) ? 1 : 0);
+  };
+  function PaddleController$onMove$lambda(it) {
+    return Unit;
+  }
+  PaddleController.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'PaddleController',
+    interfaces: [Updatable]
+  };
+  function IPongGameObject() {
+  }
+  IPongGameObject.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'IPongGameObject',
+    interfaces: [Updatable]
+  };
+  function PongGameObject(gameObject) {
+    this.gameObject = gameObject;
+    this.x_wlp1vr$_0 = this.gameObject.transform.position.x;
+    this.y_wlp1wm$_0 = this.gameObject.transform.position.y;
+    this.speedX_a22c90$_0 = 0.0;
+    this.speedY_a22c9v$_0 = 0.0;
+  }
+  Object.defineProperty(PongGameObject.prototype, 'x', {
+    configurable: true,
+    get: function () {
+      return this.x_wlp1vr$_0;
+    },
+    set: function (x) {
+      this.x_wlp1vr$_0 = x;
+    }
+  });
+  Object.defineProperty(PongGameObject.prototype, 'y', {
+    configurable: true,
+    get: function () {
+      return this.y_wlp1wm$_0;
+    },
+    set: function (y) {
+      this.y_wlp1wm$_0 = y;
+    }
+  });
+  Object.defineProperty(PongGameObject.prototype, 'speedX', {
+    configurable: true,
+    get: function () {
+      return this.speedX_a22c90$_0;
+    },
+    set: function (speedX) {
+      this.speedX_a22c90$_0 = speedX;
+    }
+  });
+  Object.defineProperty(PongGameObject.prototype, 'speedY', {
+    configurable: true,
+    get: function () {
+      return this.speedY_a22c9v$_0;
+    },
+    set: function (speedY) {
+      this.speedY_a22c9v$_0 = speedY;
+    }
+  });
+  PongGameObject.prototype.update_mx4ult$ = function (deltaTime) {
+    this.x = this.x + this.speedX * deltaTime;
+    this.y = this.y - this.speedY * deltaTime;
+    this.updateGameObject_0();
+  };
+  PongGameObject.prototype.updateGameObject_0 = function () {
+    var $receiver = this.gameObject.transform;
+    $receiver.SetPositionAndRotation(new Vector3_init(this.x, this.y, 0), $receiver.rotation);
+  };
+  PongGameObject.prototype.setPosition_dleff0$ = function (x, y) {
+    this.x = x;
+    this.y = y;
+  };
+  PongGameObject.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'PongGameObject',
+    interfaces: [IPongGameObject]
+  };
+  function Paddle(pongGameObject, paddleController, ball) {
+    this.pongGameObject_0 = pongGameObject;
+    this.paddleController_0 = paddleController;
+    this.ball_0 = ball;
+    this.paddleController_0.onMove = getCallableRef('updateMovement', function ($receiver, p1) {
+      return $receiver.updateMovement_0(p1), Unit;
+    }.bind(null, this));
+    this.paddleSpeed_0 = 10.0;
+  }
+  Paddle.prototype.update_mx4ult$ = function (deltaTime) {
+    this.paddleController_0.update_mx4ult$(deltaTime);
+    this.pongGameObject_0.update_mx4ult$(deltaTime);
+    this.checkWalls_0();
+    this.checkBallCollision_0();
+  };
+  Paddle.prototype.updateMovement_0 = function (direction) {
+    this.pongGameObject_0.speedY = this.paddleSpeed_0 * direction;
+  };
+  Paddle.prototype.checkWalls_0 = function () {
+    var $receiver = this.pongGameObject_0;
+    if ($receiver.y + PongRules_getInstance().paddleHalfHeight > PongRules_getInstance().bottom || $receiver.y - PongRules_getInstance().paddleHalfHeight < PongRules_getInstance().top) {
+      $receiver.speedY = 0.0;
+      var tmp$ = PongRules_getInstance().bottom - PongRules_getInstance().paddleHalfHeight;
+      var a = PongRules_getInstance().top + PongRules_getInstance().paddleHalfHeight;
+      var b = $receiver.y;
+      var b_0 = JsMath.max(a, b);
+      $receiver.y = JsMath.min(tmp$, b_0);
+      this.pongGameObject_0.update_mx4ult$(0.0);
+    }
+  };
+  Paddle.prototype.checkBallCollision_0 = function () {
+    var $receiver = this.pongGameObject_0;
+    if (this.ball_0.speedX > 0 && $receiver.x < this.ball_0.x)
+      return;
+    if (this.ball_0.speedX < 0 && $receiver.x > this.ball_0.x)
+      return;
+    if (this.ball_0.y < $receiver.y - PongRules_getInstance().paddleHalfHeight || this.ball_0.y > $receiver.y + PongRules_getInstance().paddleHalfHeight)
+      return;
+    var paddleWidth = 0.5;
+    var x = $receiver.x - this.ball_0.x;
+    if (JsMath.abs(x) < paddleWidth) {
+      this.ball_0.speedX = this.ball_0.speedX * -1.1;
+    }
+  };
+  Object.defineProperty(Paddle.prototype, 'speedX', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.speedX;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.speedX = tmp$;
+    }
+  });
+  Object.defineProperty(Paddle.prototype, 'speedY', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.speedY;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.speedY = tmp$;
+    }
+  });
+  Object.defineProperty(Paddle.prototype, 'x', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.x;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.x = tmp$;
+    }
+  });
+  Object.defineProperty(Paddle.prototype, 'y', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.y;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.y = tmp$;
+    }
+  });
+  Paddle.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Paddle',
+    interfaces: [IPongGameObject, Updatable]
+  };
+  function Ball(pongGameObject) {
+    this.pongGameObject_0 = pongGameObject;
+    this.start();
+  }
+  Ball.prototype.start = function () {
+    var $receiver = this.pongGameObject_0;
+    $receiver.setPosition_dleff0$(0.0, 0.0);
+    $receiver.speedX = -3.0;
+    $receiver.speedY = -3.0;
+  };
+  Ball.prototype.update_mx4ult$ = function (deltaTime) {
+    this.checkWalls_0();
+    this.checkGoal_0();
+    this.pongGameObject_0.update_mx4ult$(deltaTime);
+  };
+  Ball.prototype.checkGoal_0 = function () {
+    var $receiver = this.pongGameObject_0;
+    if ($receiver.x > PongRules_getInstance().right || $receiver.x < PongRules_getInstance().left) {
+      this.start();
+    }
+  };
+  Ball.prototype.checkWalls_0 = function () {
+    var $receiver = this.pongGameObject_0;
+    if ($receiver.y > PongRules_getInstance().bottom || $receiver.y < PongRules_getInstance().top) {
+      $receiver.speedY = $receiver.speedY * -1;
+      var tmp$ = PongRules_getInstance().bottom;
+      var a = PongRules_getInstance().top;
+      var b = $receiver.y;
+      var b_0 = JsMath.max(a, b);
+      $receiver.y = JsMath.min(tmp$, b_0);
+    }
+  };
+  Object.defineProperty(Ball.prototype, 'speedX', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.speedX;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.speedX = tmp$;
+    }
+  });
+  Object.defineProperty(Ball.prototype, 'speedY', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.speedY;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.speedY = tmp$;
+    }
+  });
+  Object.defineProperty(Ball.prototype, 'x', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.x;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.x = tmp$;
+    }
+  });
+  Object.defineProperty(Ball.prototype, 'y', {
+    configurable: true,
+    get: function () {
+      return this.pongGameObject_0.y;
+    },
+    set: function (tmp$) {
+      this.pongGameObject_0.y = tmp$;
+    }
+  });
+  Ball.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Ball',
+    interfaces: [IPongGameObject, Updatable]
+  };
+  function Pong(scene) {
+    this.scene = scene;
+    this.ball_0 = new Ball(new PongGameObject(this.scene.Ball));
+    this.paddle1_0 = new Paddle(new PongGameObject(this.scene.Paddle1), new PaddleController(), this.ball_0);
+    this.paddle2_0 = new Paddle(new PongGameObject(this.scene.Paddle2), new PaddleController(KeyCode$UpArrow, KeyCode$DownArrow), this.ball_0);
+    this.updatable_0 = listOf([this.ball_0, this.paddle1_0, this.paddle2_0]);
+    this.scene.updatePong = getCallableRef('update', function ($receiver) {
+      return $receiver.update(), Unit;
+    }.bind(null, this));
+  }
+  Pong.prototype.update = function () {
+    var deltaTime = Time$Companion.deltaTime;
+    var tmp$;
+    tmp$ = this.updatable_0.iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      element.update_mx4ult$(deltaTime);
+    }
+  };
+  Pong.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Pong',
+    interfaces: []
+  };
+  function initPong(scene) {
+    new Pong(scene);
+  }
   var package$com = _.com || (_.com = {});
   var package$hiperbou = package$com.hiperbou || (package$com.hiperbou = {});
   var package$unity = package$hiperbou.unity || (package$hiperbou.unity = {});
@@ -292,6 +603,17 @@
   _.useInstance = useInstance;
   $$importsForInline$$['unity-kotlin'] = _;
   _.moveCamera_o98sb0$ = moveCamera;
+  Object.defineProperty(_, 'PongRules', {
+    get: PongRules_getInstance
+  });
+  _.Updatable = Updatable;
+  _.PaddleController = PaddleController;
+  _.IPongGameObject = IPongGameObject;
+  _.PongGameObject = PongGameObject;
+  _.Paddle = Paddle;
+  _.Ball = Ball;
+  _.Pong = Pong;
+  _.initPong = initPong;
   main(internal.EmptyContinuation, false);
   Kotlin.defineModule('unity-kotlin', _);
   return _;

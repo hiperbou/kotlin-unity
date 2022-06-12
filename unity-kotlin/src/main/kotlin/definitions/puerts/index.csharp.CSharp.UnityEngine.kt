@@ -62,6 +62,7 @@ import org.w3c.workers.*
 import org.w3c.xhr.*
 import kotlin.Any
 import kotlin.Boolean
+import kotlin.Double
 import kotlin.Number
 import kotlin.String
 import kotlin.Suppress
@@ -142,12 +143,12 @@ external open class Vector3 : ValueType, IFormattable, `IEquatable$1`<Vector3> {
     constructor(`$x`: Number, `$y`: Number, `$z`: Number)
     constructor(`$x`: Number, `$y`: Number)
     constructor()
-    open var x: Number
-    open var y: Number
-    open var z: Number
+    open var x: Float
+    open var y: Float
+    open var z: Float
     open var `var`: Any
-    open val magnitude: Any
-    open val sqrMagnitude: Any
+    open val magnitude: Float
+    open val sqrMagnitude: Float
     open fun get_Item(`$index`: Number): Number
     open fun set_Item(`$index`: Number, `$value`: Number)
     open fun Set(`$newX`: Number, `$newY`: Number, `$newZ`: Number)
@@ -284,10 +285,70 @@ external enum class LogOption {
     NoStacktrace /* = 1 */
 }
 
-external open class Time : csharp.System.Object
+
+external open class Time : csharp.System.Object {
+    companion object {
+        /** The time at the beginning of this frame (Read Only). */
+        val time: Double;
+        /** The double precision time at the beginning of this frame (Read Only). This is the time in seconds since the start of the game. */
+        val timeAsDouble: Double;
+        /** The time since this frame started (Read Only). This is the time in seconds since the last non-additive scene has finished loading. */
+        val timeSinceLevelLoad: Double;
+        /** The double precision time since this frame started (Read Only). This is the time in seconds since the last non-additive scene has finished loading. */
+        val timeSinceLevelLoadAsDouble: Double;
+        /** The interval in seconds from the last frame to the current one (Read Only). */
+        val deltaTime: Float;
+        /** The time since the last MonoBehaviour.FixedUpdate started (Read Only). This is the time in seconds since the start of the game. */
+        val fixedTime: Double;
+        /** The double precision time since the last MonoBehaviour.FixedUpdate started (Read Only). This is the time in seconds since the start of the game. */
+        val fixedTimeAsDouble: Double;
+        /** The timeScale-independent time for this frame (Read Only). This is the time in seconds since the start of the game. */
+        val unscaledTime: Double;
+        /** The double precision timeScale-independent time for this frame (Read Only). This is the time in seconds since the start of the game. */
+        val unscaledTimeAsDouble: Double;
+        /** The timeScale-independent time at the beginning of the last MonoBehaviour.FixedUpdate phase (Read Only). This is the time in seconds since the start of the game. */
+        val fixedUnscaledTime: Double;
+        /** The double precision timeScale-independent time at the beginning of the last MonoBehaviour.FixedUpdate (Read Only). This is the time in seconds since the start of the game. */
+        val fixedUnscaledTimeAsDouble: Double;
+        /** The timeScale-independent interval in seconds from the last frame to the current one (Read Only). */
+        val unscaledDeltaTime: Double;
+        /** The timeScale-independent interval in seconds from the last MonoBehaviour.FixedUpdate phase to the current one (Read Only). */
+        val fixedUnscaledDeltaTime: Double;
+        /** The interval in seconds at which physics and other fixed frame rate updates (like MonoBehaviour's MonoBehaviour.FixedUpdate) are performed. */
+        var fixedDeltaTime: Double;
+        /** The maximum value of Time.deltaTime in any given frame. This is a time in seconds that limits the increase of Time.time between two frames. */
+        var maximumDeltaTime: Double;
+        /** A smoothed out Time.deltaTime (Read Only). */
+        val smoothDeltaTime: Double;
+        /** The maximum time a frame can spend on particle updates. If the frame takes longer than this, then updates are split into multiple smaller updates. */
+        var maximumParticleDeltaTime: Double;
+        /** The scale at which time passes. */
+        var timeScale: Double;
+        /** The total Double of frames since the start of the game (Read Only). */
+        val frameCount: Double;
+        val renderedFrameCount: Double;
+        /** The real time in seconds since the game started (Read Only). */
+        val realtimeSinceStartup: Double;
+        /** The real time in seconds since the game started (Read Only). Double precision version of Time.realtimeSinceStartup.  */
+        val realtimeSinceStartupAsDouble: Double;
+        /** Slows your application’s playback time to allow Unity to save screenshots in between frames. */
+        var captureDeltaTime: Double;
+        /** The reciprocal of Time.captureDeltaTime. */
+        var captureFramerate: Double;
+        /** Returns true if called inside a fixed time step callback (like MonoBehaviour's MonoBehaviour.FixedUpdate), otherwise returns false. */
+        val inFixedTimeStep:Boolean;
+    }
+}
 
 external open class Transform : Component, IEnumerable {
     override var `var`: Any
+    open var position: Vector3
+    open var localPosition: Vector3
+    open var eulerAngles: Vector3
+    open var localEulerAngles: Vector3
+    open var right: Vector3
+    open var up: Vector3
+    open var forward: Vector3
     open var rotation: Quaternion
     open var localRotation: Any
     open var parent: Any
