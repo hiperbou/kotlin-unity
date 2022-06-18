@@ -42,11 +42,13 @@
   var L16 = Kotlin.Long.fromInt(16);
   var internal = Kotlin.kotlin.coroutines.js.internal;
   var Kind_OBJECT = Kotlin.Kind.OBJECT;
+  var Random = Kotlin.kotlin.random.Random;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var Input$Companion = $module$csharp.UnityEngine.Input;
   var KeyCode$W = $module$csharp.UnityEngine.KeyCode.W;
   var KeyCode$S = $module$csharp.UnityEngine.KeyCode.S;
   var getCallableRef = Kotlin.getCallableRef;
+  var padStart = Kotlin.kotlin.text.padStart_vrc1nu$;
   var Time$Companion = $module$csharp.UnityEngine.Time;
   var KeyCode$UpArrow = $module$csharp.UnityEngine.KeyCode.UpArrow;
   var KeyCode$DownArrow = $module$csharp.UnityEngine.KeyCode.DownArrow;
@@ -88,6 +90,9 @@
   }
   var SetPosition = defineInlineFunction('unity-kotlin.SetPosition_rry3v7$', function ($receiver, position) {
     $receiver.SetPositionAndRotation(position, $receiver.rotation);
+  });
+  var GetComponent = defineInlineFunction('unity-kotlin.GetComponent_8cg27s$', function ($receiver, $type) {
+    return $receiver.GetComponent($type);
   });
   function Coroutine$main$lambda($receiver_0, controller, continuation_0) {
     CoroutineImpl.call(this, continuation_0);
@@ -296,6 +301,12 @@
     this.left = -7.0;
     this.right = 7.0;
     this.paddleHalfHeight = 1.0;
+    this.paddleWidth = 0.5;
+    this.maxBallSpeedX = 20.0;
+    this.maxBallSpeedY = 5.0;
+    this.ballSpeedMultiplier = 1.1;
+    this.initialBallSpeedX = 3.0;
+    this.initialBallSpeedY = 3.0;
   }
   PongRules.$metadata$ = {
     kind: Kind_OBJECT,
@@ -308,6 +319,9 @@
       new PongRules();
     }
     return PongRules_instance;
+  }
+  function randomSign() {
+    return Random.Default.nextFloat() > 0.5 ? 1 : -1;
   }
   function Updatable() {
   }
@@ -349,6 +363,7 @@
     this.y_wlp1wm$_0 = this.gameObject.transform.position.y;
     this.speedX_a22c90$_0 = 0.0;
     this.speedY_a22c9v$_0 = 0.0;
+    this.trailRenderer_0 = this.gameObject.GetComponent('TrailRenderer');
   }
   Object.defineProperty(PongGameObject.prototype, 'x', {
     configurable: true,
@@ -398,6 +413,12 @@
   PongGameObject.prototype.setPosition_dleff0$ = function (x, y) {
     this.x = x;
     this.y = y;
+    this.clearTrail_0();
+  };
+  PongGameObject.prototype.clearTrail_0 = function () {
+    this.trailRenderer_0.enabled = false;
+    this.trailRenderer_0.Clear();
+    this.trailRenderer_0.enabled = true;
   };
   PongGameObject.$metadata$ = {
     kind: Kind_CLASS,
@@ -442,10 +463,13 @@
       return;
     if (this.ball_0.y < $receiver.y - PongRules_getInstance().paddleHalfHeight || this.ball_0.y > $receiver.y + PongRules_getInstance().paddleHalfHeight)
       return;
-    var paddleWidth = 0.5;
     var x = $receiver.x - this.ball_0.x;
-    if (JsMath.abs(x) < paddleWidth) {
-      this.ball_0.speedX = this.ball_0.speedX * -1.1;
+    if (JsMath.abs(x) < PongRules_getInstance().paddleWidth) {
+      var tmp$ = this.ball_0;
+      var a = this.ball_0.speedX * PongRules_getInstance().ballSpeedMultiplier;
+      var b = PongRules_getInstance().maxBallSpeedX;
+      tmp$.speedX = JsMath.min(a, b) * -1;
+      this.ball_0.speedY = ($receiver.y - this.ball_0.y) * PongRules_getInstance().maxBallSpeedY;
     }
   };
   Object.defineProperty(Paddle.prototype, 'speedX', {
@@ -489,15 +513,15 @@
     simpleName: 'Paddle',
     interfaces: [IPongGameObject, Updatable]
   };
-  function Ball(pongGameObject) {
+  function Ball(pongGameObject, onBallReachedGoal) {
     this.pongGameObject_0 = pongGameObject;
-    this.start();
+    this.onBallReachedGoal = onBallReachedGoal;
   }
   Ball.prototype.start = function () {
     var $receiver = this.pongGameObject_0;
     $receiver.setPosition_dleff0$(0.0, 0.0);
-    $receiver.speedX = -3.0;
-    $receiver.speedY = -3.0;
+    $receiver.speedX = (Random.Default.nextFloat() > 0.5 ? 1 : -1) * PongRules_getInstance().initialBallSpeedX;
+    $receiver.speedY = (Random.Default.nextFloat() > 0.5 ? 1 : -1) * PongRules_getInstance().initialBallSpeedY;
   };
   Ball.prototype.update_mx4ult$ = function (deltaTime) {
     this.checkWalls_0();
@@ -507,7 +531,7 @@
   Ball.prototype.checkGoal_0 = function () {
     var $receiver = this.pongGameObject_0;
     if ($receiver.x > PongRules_getInstance().right || $receiver.x < PongRules_getInstance().left) {
-      this.start();
+      this.onBallReachedGoal(this);
     }
   };
   Ball.prototype.checkWalls_0 = function () {
@@ -562,15 +586,78 @@
     simpleName: 'Ball',
     interfaces: [IPongGameObject, Updatable]
   };
+  function UI(scene, matchState) {
+    this.matchState_0 = matchState;
+    this.leftScore_0 = scene.LeftScore.GetComponent('Text');
+    this.rightScore_0 = scene.RightScore.GetComponent('Text');
+    this.updateScores();
+  }
+  UI.prototype.updateScores = function () {
+    this.leftScore_0.text = this.formatScore_0(this.matchState_0.leftScore);
+    this.rightScore_0.text = this.formatScore_0(this.matchState_0.rightScore);
+  };
+  UI.prototype.formatScore_0 = function ($receiver) {
+    return padStart($receiver.toString(), 2, 48);
+  };
+  UI.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'UI',
+    interfaces: []
+  };
+  function MatchState() {
+    this.leftScore = 0;
+    this.rightScore = 0;
+  }
+  MatchState.prototype.reset = function () {
+    this.leftScore = 0;
+    this.rightScore = 0;
+  };
+  MatchState.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'MatchState',
+    interfaces: []
+  };
+  function Match(matchState, ui) {
+    this.matchState_0 = matchState;
+    this.ui_0 = ui;
+  }
+  Match.prototype.start_187q7$ = function (ball) {
+    this.matchState_0.reset();
+    ball.start();
+  };
+  Match.prototype.onBallReachedGoal_187q7$ = function (ball) {
+    if (ball.x > 0) {
+      var tmp$;
+      tmp$ = this.matchState_0;
+      tmp$.leftScore = tmp$.leftScore + 1 | 0;
+    } else {
+      var tmp$_0;
+      tmp$_0 = this.matchState_0;
+      tmp$_0.rightScore = tmp$_0.rightScore + 1 | 0;
+    }
+    this.ui_0.updateScores();
+    ball.start();
+  };
+  Match.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Match',
+    interfaces: []
+  };
   function Pong(scene) {
     this.scene = scene;
-    this.ball_0 = new Ball(new PongGameObject(this.scene.Ball));
+    this.matchState_0 = new MatchState();
+    this.ui_0 = new UI(this.scene, this.matchState_0);
+    this.match_0 = new Match(this.matchState_0, this.ui_0);
+    this.ball_0 = new Ball(new PongGameObject(this.scene.Ball), getCallableRef('onBallReachedGoal', function ($receiver, p1) {
+      return $receiver.onBallReachedGoal_187q7$(p1), Unit;
+    }.bind(null, this.match_0)));
     this.paddle1_0 = new Paddle(new PongGameObject(this.scene.Paddle1), new PaddleController(), this.ball_0);
     this.paddle2_0 = new Paddle(new PongGameObject(this.scene.Paddle2), new PaddleController(KeyCode$UpArrow, KeyCode$DownArrow), this.ball_0);
     this.updatable_0 = listOf([this.ball_0, this.paddle1_0, this.paddle2_0]);
     this.scene.updatePong = getCallableRef('update', function ($receiver) {
       return $receiver.update(), Unit;
     }.bind(null, this));
+    this.match_0.start_187q7$(this.ball_0);
   }
   Pong.prototype.update = function () {
     var deltaTime = Time$Companion.deltaTime;
@@ -597,6 +684,7 @@
   package$coroutines.launch_bacyg4$ = launch_0;
   _.println_s8jyv4$ = println;
   _.SetPosition_rry3v7$ = SetPosition;
+  _.GetComponent_8cg27s$ = GetComponent;
   _.main = main;
   _.greet = greet;
   _.greetByName = greetByName;
@@ -612,6 +700,9 @@
   _.PongGameObject = PongGameObject;
   _.Paddle = Paddle;
   _.Ball = Ball;
+  _.UI = UI;
+  _.MatchState = MatchState;
+  _.Match = Match;
   _.Pong = Pong;
   _.initPong = initPong;
   main(internal.EmptyContinuation, false);

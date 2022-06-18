@@ -1,27 +1,46 @@
+import PongRules.ballSpeedMultiplier
+import PongRules.initialBallSpeedX
+import PongRules.initialBallSpeedY
+import PongRules.maxBallSpeedX
+import PongRules.maxBallSpeedY
 import PongRules.paddleHalfHeight
 import PongRules.paddleWidth
 import csharp.UnityEngine.*
+import csharp.UnityEngine.UI.Text
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.random.Random.Default.nextFloat
 
 external class PongScene {
     val Paddle1:GameObject
     val Paddle2:GameObject
     val Ball:GameObject
 
+    var LeftScore: GameObject
+    var RightScore: GameObject
+
     var updatePong:dynamic
 }
 
 object PongRules {
-    val top = -5f
-    val bottom = 5f
-    val left = -7f
-    val right = 7f
+    const val top = -5f
+    const val bottom = 5f
+    const val left = -7f
+    const val right = 7f
 
-    val paddleHalfHeight = 1f
-    val paddleWidth = 0.5f
+    const val paddleHalfHeight = 1f
+    const val paddleWidth = 0.5f
+
+    const val maxBallSpeedX = 20.0f
+    const val maxBallSpeedY = 5.0f
+    const val ballSpeedMultiplier = 1.1f
+
+    const val initialBallSpeedX = 3.0f
+    const val initialBallSpeedY = 3.0f
 }
+
+private inline fun randomSign() = if (nextFloat() > 0.5) 1 else - 1
 
 interface Updatable {
     fun update(deltaTime: Float)
@@ -50,6 +69,8 @@ class PongGameObject(val gameObject: GameObject):IPongGameObject {
     override var speedX = 0.0f
     override var speedY = 0.0f
 
+    private val trailRenderer = gameObject.GetComponent<TrailRenderer>("TrailRenderer")
+
     override fun update(deltaTime:Float) {
         x += speedX * deltaTime
         y -= speedY * deltaTime
@@ -63,6 +84,14 @@ class PongGameObject(val gameObject: GameObject):IPongGameObject {
     fun setPosition(x:Float, y:Float) {
         this.x = x
         this.y = y
+
+        clearTrail()
+    }
+
+    private fun clearTrail() {
+        trailRenderer.enabled = false
+        trailRenderer.Clear()
+        trailRenderer.enabled = true
     }
 }
 
@@ -102,20 +131,19 @@ class Paddle(private val pongGameObject: PongGameObject,
         if (ball.y < y - paddleHalfHeight || ball.y > y + paddleHalfHeight) return
 
         if (abs(x - ball.x) < paddleWidth) {
-            ball.speedX *= -1.1f
+            ball.speedX = min(ball.speedX * ballSpeedMultiplier, maxBallSpeedX) * -1
+            ball.speedY = (y - ball.y) * maxBallSpeedY
         }
     }
 }
 
-class Ball(private val pongGameObject: PongGameObject):Updatable, IPongGameObject by pongGameObject {
-    init {
-        start()
-    }
+class Ball(private val pongGameObject: PongGameObject, val onBallReachedGoal:(Ball)->Unit):Updatable, IPongGameObject by pongGameObject {
 
     fun start() = with(pongGameObject) {
         setPosition(0f, 0f)
-        speedX = -3.0f
-        speedY = -3.0f
+
+        speedX = randomSign() * initialBallSpeedX
+        speedY = randomSign() * initialBallSpeedY
     }
 
     override fun update(deltaTime:Float) {
@@ -126,7 +154,7 @@ class Ball(private val pongGameObject: PongGameObject):Updatable, IPongGameObjec
 
     private fun checkGoal() = with(pongGameObject) {
         if (x > PongRules.right || x < PongRules.left) {
-            start()
+            onBallReachedGoal(this@Ball)
         }
     }
 
@@ -138,20 +166,66 @@ class Ball(private val pongGameObject: PongGameObject):Updatable, IPongGameObjec
     }
 }
 
+class UI(scene: PongScene, private val matchState:MatchState) {
+    private val leftScore = scene.LeftScore.GetComponent<Text>("Text")
+    private val rightScore = scene.RightScore.GetComponent<Text>("Text")
+
+    init {
+        updateScores()
+    }
+    fun updateScores() {
+        leftScore.text = matchState.leftScore.formatScore()
+        rightScore.text = matchState.rightScore.formatScore()
+    }
+
+    private fun Int.formatScore() = toString().padStart(2, '0')
+}
+
+class MatchState {
+    var leftScore = 0
+    var rightScore = 0
+
+    fun reset() {
+        leftScore = 0
+        rightScore = 0
+    }
+}
+
+class Match(private val matchState:MatchState, private val ui:UI) {
+    fun start(ball:Ball) {
+        matchState.reset()
+        ball.start()
+    }
+    fun onBallReachedGoal(ball:Ball) {
+        if (ball.x > 0) {
+            matchState.leftScore++
+        } else {
+            matchState.rightScore++
+        }
+        ui.updateScores()
+        ball.start()
+    }
+}
+
 class Pong(val scene: PongScene) {
-    private val ball = Ball(PongGameObject(scene.Ball))
+    private val matchState = MatchState()
+    private val ui = UI(scene, matchState)
+    private val match = Match(matchState, ui)
+
+    private val ball = Ball(PongGameObject(scene.Ball), match::onBallReachedGoal)
     private val paddle1 = Paddle(PongGameObject(scene.Paddle1), PaddleController(), ball)
     private val paddle2 = Paddle(PongGameObject(scene.Paddle2), PaddleController(KeyCode.UpArrow, KeyCode.DownArrow), ball)
 
-    private val updatable = listOf(ball, paddle1, paddle2)
+    private val updatables = listOf(ball, paddle1, paddle2)
 
     init {
         scene.updatePong = ::update
+        match.start(ball)
     }
 
     fun update() {
         val deltaTime = Time.deltaTime
-        updatable.forEach { it.update(deltaTime) }
+        updatables.forEach { it.update(deltaTime) }
     }
 }
 

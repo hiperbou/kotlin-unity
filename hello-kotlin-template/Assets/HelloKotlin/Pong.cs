@@ -25,6 +25,8 @@ namespace UnityKotlin
         public GameObject Paddle1;
         public GameObject Paddle2;
         public GameObject Ball;
+        public GameObject LeftScore;
+        public GameObject RightScore;
 
         public updatePong updatePong;
 
