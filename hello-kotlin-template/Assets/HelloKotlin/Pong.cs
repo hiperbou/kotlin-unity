@@ -35,7 +35,7 @@ namespace UnityKotlin
 
         void Start()
         {
-            moduleLoader = new KotlinModuleLoader("unity-kotlin");
+            moduleLoader = new KotlinModuleLoader("kotlin-unity");
             kotlin = new PongKotlinModule(
                 moduleLoader.getDelegate<initPong>("initPong")
             );

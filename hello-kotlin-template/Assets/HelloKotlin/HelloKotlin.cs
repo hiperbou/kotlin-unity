@@ -62,7 +62,7 @@ namespace UnityKotlin
 
         void Start()
         {
-            moduleLoader = new KotlinModuleLoader("unity-kotlin");
+            moduleLoader = new KotlinModuleLoader("kotlin-unity");
             kotlin = new KotlinModule(
                 moduleLoader.getDelegate<greet>("greet"),
                 moduleLoader.getDelegate<greetByName>("greetByName"),

@@ -31,9 +31,9 @@ kotlin {
 }
 
 task copyJsToResources(type: Copy) {
-    from 'build/classes/kotlin/main/unity-kotlin.js'
+    from 'build/classes/kotlin/main/kotlin-unity.js'
     into "../hello-kotlin-template/Assets/HelloKotlin/Resources"
-    rename 'unity-kotlin.js', "unity-kotlin.js.txt"
+    rename 'kotlin-unity.js', "kotlin-unity.js.txt"
 }
 
 build.finalizedBy(copyJsToResources)

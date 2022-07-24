@@ -5,15 +5,15 @@
     factory(module.exports, require('kotlin'), require('csharp'), require('kotlinx-coroutines-core'));
   else {
     if (typeof kotlin === 'undefined') {
-      throw new Error("Error loading module 'unity-kotlin'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'unity-kotlin'.");
+      throw new Error("Error loading module 'kotlin-unity'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'kotlin-unity'.");
     }
     if (typeof csharp === 'undefined') {
-      throw new Error("Error loading module 'unity-kotlin'. Its dependency 'csharp' was not found. Please, check whether 'csharp' is loaded prior to 'unity-kotlin'.");
+      throw new Error("Error loading module 'kotlin-unity'. Its dependency 'csharp' was not found. Please, check whether 'csharp' is loaded prior to 'kotlin-unity'.");
     }
     if (typeof this['kotlinx-coroutines-core'] === 'undefined') {
-      throw new Error("Error loading module 'unity-kotlin'. Its dependency 'kotlinx-coroutines-core' was not found. Please, check whether 'kotlinx-coroutines-core' is loaded prior to 'unity-kotlin'.");
+      throw new Error("Error loading module 'kotlin-unity'. Its dependency 'kotlinx-coroutines-core' was not found. Please, check whether 'kotlinx-coroutines-core' is loaded prior to 'kotlin-unity'.");
     }
-    root['unity-kotlin'] = factory(typeof this['unity-kotlin'] === 'undefined' ? {} : this['unity-kotlin'], kotlin, csharp, this['kotlinx-coroutines-core']);
+    root['kotlin-unity'] = factory(typeof this['kotlin-unity'] === 'undefined' ? {} : this['kotlin-unity'], kotlin, csharp, this['kotlinx-coroutines-core']);
   }
 }(this, function (_, Kotlin, $module$csharp, $module$kotlinx_coroutines_core) {
   'use strict';
@@ -88,10 +88,10 @@
   function println(message) {
     Debug$Companion.Log(message != null ? message : 'null');
   }
-  var SetPosition = defineInlineFunction('unity-kotlin.SetPosition_rry3v7$', function ($receiver, position) {
+  var SetPosition = defineInlineFunction('kotlin-unity.SetPosition_rry3v7$', function ($receiver, position) {
     $receiver.SetPositionAndRotation(position, $receiver.rotation);
   });
-  var GetComponent = defineInlineFunction('unity-kotlin.GetComponent_8cg27s$', function ($receiver, $type) {
+  var GetComponent = defineInlineFunction('kotlin-unity.GetComponent_8cg27s$', function ($receiver, $type) {
     return $receiver.GetComponent($type);
   });
   function Coroutine$main$lambda($receiver_0, controller, continuation_0) {
@@ -653,7 +653,7 @@
     }.bind(null, this.match_0)));
     this.paddle1_0 = new Paddle(new PongGameObject(this.scene.Paddle1), new PaddleController(), this.ball_0);
     this.paddle2_0 = new Paddle(new PongGameObject(this.scene.Paddle2), new PaddleController(KeyCode$UpArrow, KeyCode$DownArrow), this.ball_0);
-    this.updatable_0 = listOf([this.ball_0, this.paddle1_0, this.paddle2_0]);
+    this.updatables_0 = listOf([this.ball_0, this.paddle1_0, this.paddle2_0]);
     this.scene.updatePong = getCallableRef('update', function ($receiver) {
       return $receiver.update(), Unit;
     }.bind(null, this));
@@ -662,7 +662,7 @@
   Pong.prototype.update = function () {
     var deltaTime = Time$Companion.deltaTime;
     var tmp$;
-    tmp$ = this.updatable_0.iterator();
+    tmp$ = this.updatables_0.iterator();
     while (tmp$.hasNext()) {
       var element = tmp$.next();
       element.update_mx4ult$(deltaTime);
@@ -689,7 +689,7 @@
   _.greet = greet;
   _.greetByName = greetByName;
   _.useInstance = useInstance;
-  $$importsForInline$$['unity-kotlin'] = _;
+  $$importsForInline$$['kotlin-unity'] = _;
   _.moveCamera_o98sb0$ = moveCamera;
   Object.defineProperty(_, 'PongRules', {
     get: PongRules_getInstance
@@ -706,8 +706,8 @@
   _.Pong = Pong;
   _.initPong = initPong;
   main(internal.EmptyContinuation, false);
-  Kotlin.defineModule('unity-kotlin', _);
+  Kotlin.defineModule('kotlin-unity', _);
   return _;
 }));
 
-//# sourceMappingURL=unity-kotlin.js.map
+//# sourceMappingURL=kotlin-unity.js.map

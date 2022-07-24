@@ -1,4 +1,4 @@
-# unity-kotlin
+# kotlin-unity
 Use the amazing Kotlin language with Unity
 
 Uses [Puerts](https://github.com/Tencent/puerts), a Javascript runtime built for Unity
@@ -7,13 +7,13 @@ Uses [Puerts](https://github.com/Tencent/puerts), a Javascript runtime built for
 
 Open the hello-kotlin-template Unity project and search for the HelloKotlin scene.
 
-Open the unity-kotlin project with [IntelliJ IDEA Community](https://www.jetbrains.com/idea/download/) and run the build task to update the code in the Unity project.
+Open the kotlin-unity project with [IntelliJ IDEA Community](https://www.jetbrains.com/idea/download/) and run the build task to update the code in the Unity project.
 
-![](https://github.com/hiperbou/unity-kotlin/blob/master/screenshots/hello-kotlin.jpg)
+![](https://github.com/hiperbou/kotlin-unity/blob/master/screenshots/hello-kotlin.jpg)
 
 Pong Example
 
-![](https://github.com/hiperbou/unity-kotlin/blob/master/screenshots/pong.jpg)
+![](https://github.com/hiperbou/kotlin-unity/blob/master/screenshots/pong.jpg)
 
 
 ## Build and release
